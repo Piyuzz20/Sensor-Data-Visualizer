@@ -1,0 +1,45 @@
+import random
+import time
+import datetime
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from collections import deque
+import pandas as pd
+
+
+time_buffer = deque(maxlen=50)
+temp_buffer = deque(maxlen=50)
+hum_buffer = deque(maxlen=50)
+
+
+log = []
+
+def simulate_data():
+    tm = datetime.datetime.now()
+    temp = random.uniform(20, 30)   
+    hum = random.uniform(40, 70)    
+    return tm, temp, hum
+
+def update(frame):
+    tm, temp, hum = simulate_data()
+    
+    
+    time_buffer.append(tm)
+    temp_buffer.append(temp)
+    hum_buffer.append(hum)
+
+
+    log.append({"time": tm, "temperature": temp, "humidity": hum})
+
+
+    plt.cla()
+    plt.plot(time_buffer, temp_buffer, label="Temperature (°C)")
+    plt.plot(time_buffer, hum_buffer, label="Humidity (%)")
+    plt.legend(loc="upper left")
+    plt.tight_layout()
+
+ani = animation.FuncAnimation(plt.gcf(), update, interval=500)
+plt.show()
+
+df_file = pd.DataFrame(log)
+df_file.to_csv("sensor_log.csv", index=False)
